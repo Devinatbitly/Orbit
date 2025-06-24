@@ -679,31 +679,51 @@
                 DICTIONARY = null;
             }
 
-            // Load puzzles
+       // Load puzzles
             try {
+                console.log('Attempting to load puzzles.js...');
                 const puzzleResponse = await fetch('puzzles.js');
+                console.log('Puzzle response status:', puzzleResponse.status);
+                
                 if (puzzleResponse.ok) {
                     const puzzleText = await puzzleResponse.text();
-                    // Execute the puzzle file to get ORBIT_PUZZLES
-                    const scriptElement = document.createElement('script');
-                    scriptElement.textContent = puzzleText;
-                    document.head.appendChild(scriptElement);
+                    console.log('Puzzle file content length:', puzzleText.length);
                     
-                    // ORBIT_PUZZLES should now be available globally
-                    if (typeof ORBIT_PUZZLES !== 'undefined') {
-                        PUZZLES = ORBIT_PUZZLES;
-                        console.log('Puzzles loaded successfully:', PUZZLES.length, 'puzzles');
+                    // Try to extract ORBIT_PUZZLES directly from the text
+                    const puzzleMatch = puzzleText.match(/const ORBIT_PUZZLES = (\[[\s\S]*?\]);/);
+                    if (puzzleMatch) {
+                        console.log('Found ORBIT_PUZZLES in file');
+                        try {
+                            PUZZLES = eval(puzzleMatch[1]);
+                            console.log('Puzzles loaded successfully:', PUZZLES.length, 'puzzles');
+                        } catch (evalError) {
+                            console.log('Error evaluating puzzles:', evalError);
+                            throw new Error('Failed to parse puzzles');
+                        }
                     } else {
-                        throw new Error('ORBIT_PUZZLES not found in puzzle file');
+                        // Fallback: try executing the script
+                        console.log('Trying script execution method...');
+                        const scriptElement = document.createElement('script');
+                        scriptElement.textContent = puzzleText;
+                        document.head.appendChild(scriptElement);
+                        
+                        // ORBIT_PUZZLES should now be available globally
+                        if (typeof ORBIT_PUZZLES !== 'undefined') {
+                            PUZZLES = ORBIT_PUZZLES;
+                            console.log('Puzzles loaded via script execution:', PUZZLES.length, 'puzzles');
+                        } else {
+                            throw new Error('ORBIT_PUZZLES not found after script execution');
+                        }
+                        
+                        // Clean up script element
+                        document.head.removeChild(scriptElement);
                     }
-                    
-                    // Clean up script element
-                    document.head.removeChild(scriptElement);
                 } else {
+                    console.log('Failed to fetch puzzles.js, status:', puzzleResponse.status);
                     throw new Error('Failed to fetch puzzles');
                 }
             } catch (error) {
-                console.log('Puzzle file not found - using fallback puzzles');
+                console.log('Puzzle file loading failed, using fallback puzzles. Error:', error);
                 // Fallback puzzles if file can't be loaded
                 PUZZLES = [
                     { left: 'GHOST', right: 'ARTSY', answer: 'START', leftMissing: 2, rightMissing: 3 },
@@ -712,7 +732,10 @@
                     { left: 'GOLEM', right: 'URGED', answer: 'LEMUR', leftMissing: 3, rightMissing: 2 },
                     { left: 'STARE', right: 'ACHED', answer: 'REACH', leftMissing: 2, rightMissing: 3 }
                 ];
+                console.log('Using fallback puzzles:', PUZZLES.length, 'puzzles');
             }
+
+            console.log('Initializing game...');
 
             initGame();
         }
