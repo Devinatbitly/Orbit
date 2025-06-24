@@ -1,3 +1,78 @@
+orbit1 (1).html
+939 lines
+
+html
+
+You helped me create this attached puzzle game. I need a few additional adjustments.
+
+When typing letters via a physical keyboard, they are duplicated ("F" types "FF").
+For each puzzle, let's add a number in the code, starting from 1001. 1001; 1002, etc.
+When the puzzle is complete, I'd like to add a button to share results like a Wordle solution. For example: Orbit 1,001 3/6 Include the gray, yellow and green boxes, with the bullet character placed where it was in the puzzle.
+Edit
+I'll help you fix those issues and add the new features. Let me update the HTML file with these improvements:
+
+
+Orbit - Missing Link Puzzle Game (Updated)
+Interactive artifact 
+Perfect! I've updated your Orbit game with all the requested improvements:
+
+Fixed Issues:
+Double letter typing bug: Fixed by adding e.preventDefault() and e.stopPropagation() to the keyboard event handler, preventing the default browser behavior that was causing letters to be typed twice.
+Puzzle numbering: Added puzzle numbers starting from 1001, with each puzzle getting a unique number (1001-1011 based on the puzzle index). The number is displayed prominently above the game board.
+Share functionality: Added a complete share feature that works like Wordle:
+Shows the result in the game over modal
+Includes puzzle number and score (e.g., "Orbit 1,001 3/6")
+Uses emoji squares: 🟩 for correct, 🟨 for present, ⬜ for absent
+Places the bullet character (•) exactly where it appears in the puzzle
+Supports multiple share methods: native sharing, clipboard copy, or text selection fallback
+New Features:
+Puzzle number display: Shows "Puzzle #1001" etc. in the header
+Share button: Appears in the game over modal
+Share result preview: Shows exactly what will be shared before copying
+Smart sharing: Uses the best available method (native share API, clipboard, or selection)
+Success feedback: Shows confirmation messages when results are copied
+The share format looks exactly like Wordle results:
+
+Orbit 1,001 3/6
+
+🟩⬜•🟨🟩
+🟨🟩•🟩🟩
+🟩🟩•🟩🟩
+The game now provides a much smoother experience with proper keyboard handling and a complete sharing system that matches modern puzzle game conventions!
+
+
+
+
+It looks like some users are still having double letters appear when using a physical keyboard
+
+Edit
+You're right! The keyboard event handling can be tricky across different browsers and devices. Let me fix this with a more robust solution that prevents double letter input:
+
+
+Orbit - Missing Link Puzzle Game (Updated)
+Interactive artifact ∙ Version 2 
+I've implemented a more robust solution to prevent double letter input:
+
+Key Improvements:
+Debounce mechanism: Added a 100ms debounce that ignores repeated keypresses of the same key within that timeframe
+Time tracking: Uses timestamps to track when keys were pressed
+Key tracking: Remembers the last key pressed to detect rapid repeats
+Smart prevention: Only prevents default behavior for keys the game actually handles
+Keyup reset: Clears the debounce tracking when a key is released for faster response
+How it works:
+When a key is pressed, it checks if it's the same key pressed within the last 100ms
+If so, it ignores the duplicate event
+The keyup event resets the tracking for faster response on legitimate key presses
+Only game-relevant keys (letters, Enter, Backspace) have their default behavior prevented
+This approach should eliminate the double letter issue across different browsers, operating systems, and keyboard types while maintaining responsive gameplay. The 100ms debounce window is short enough to not interfere with fast typing but long enough to catch most duplicate events caused by browser inconsistencies or sticky keys.
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -609,7 +684,7 @@
             { left: 'MARCH', right: 'ARMOR', answer: 'CHARM', leftMissing: 2, rightMissing: 3 },
         ];
 
-        async function loadDictionary() {
+       async function loadDictionary() {
             try {
                 // Try to load from GitHub - update this URL to match your repository
                 // Example: https://raw.githubusercontent.com/yourusername/yourrepo/main/dict.txt
@@ -758,26 +833,52 @@
             }
         }
 
+        // Add debounce tracking for keyboard events
+        let lastKeyTime = 0;
+        let lastKey = '';
+
         function setupKeyboard() {
             // On-screen keyboard
             document.querySelectorAll('.key').forEach(button => {
                 button.addEventListener('click', () => handleKey(button.dataset.key));
             });
             
-            // Physical keyboard - prevent event bubbling
+            // Physical keyboard with debouncing
             document.addEventListener('keydown', (e) => {
                 if (gameState !== 'playing') return;
                 
-                // Prevent default behavior and stop propagation to avoid duplication
-                e.preventDefault();
-                e.stopPropagation();
+                const currentTime = Date.now();
+                const key = e.key;
                 
-                if (e.key === 'Enter') {
+                // Debounce: ignore if same key pressed within 100ms
+                if (key === lastKey && currentTime - lastKeyTime < 100) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                
+                lastKey = key;
+                lastKeyTime = currentTime;
+                
+                // Prevent default for keys we handle
+                if (key === 'Enter' || key === 'Backspace' || /^[a-zA-Z]$/.test(key)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                if (key === 'Enter') {
                     handleKey('Enter');
-                } else if (e.key === 'Backspace') {
+                } else if (key === 'Backspace') {
                     handleKey('Backspace');
-                } else if (/^[a-zA-Z]$/.test(e.key)) {
-                    handleKey(e.key.toUpperCase());
+                } else if (/^[a-zA-Z]$/.test(key)) {
+                    handleKey(key.toUpperCase());
+                }
+            });
+
+            // Also handle keyup to reset debounce faster
+            document.addEventListener('keyup', (e) => {
+                if (e.key === lastKey) {
+                    lastKey = '';
                 }
             });
         }
