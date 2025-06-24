@@ -582,6 +582,7 @@
     <script>
         // Game state
         let DICTIONARY = null;
+        let PUZZLES = null;
         let currentPuzzle;
         let currentPuzzleNumber;
         let currentRow = 0;
@@ -590,32 +591,12 @@
         let keyboardState = {};
         let gameResults = []; // Store results for sharing
 
-        // Game puzzles - verified puzzle set
-        const PUZZLES = [
-            { left: 'GHOST', right: 'ARTSY', answer: 'START', leftMissing: 2, rightMissing: 3 },
-            { left: 'GREAT', right: 'ENDED', answer: 'EATEN', leftMissing: 3, rightMissing: 2 },
-            { left: 'NACHO', right: 'SERVE', answer: 'CHOSE', leftMissing: 3, rightMissing: 2 },
-            { left: 'GOLEM', right: 'URGED', answer: 'LEMUR', leftMissing: 3, rightMissing: 2 },
-            { left: 'DEALT', right: 'ERASE', answer: 'ALTER', leftMissing: 3, rightMissing: 2 },
-            { left: 'STARE', right: 'ACHED', answer: 'REACH', leftMissing: 2, rightMissing: 3 },
-            { left: 'COMET', right: 'HINGE', answer: 'THING', leftMissing: 1, rightMissing: 4 },
-            { left: 'AHEAD', right: 'OPTED', answer: 'ADOPT', leftMissing: 2, rightMissing: 3 },
-            { left: 'KNEAD', right: 'ULTRA', answer: 'ADULT', leftMissing: 2, rightMissing: 3 },
-            { left: 'DECAF', right: 'TERSE', answer: 'AFTER', leftMissing: 2, rightMissing: 3 },
-            { left: 'EQUAL', right: 'BUMPY', answer: 'ALBUM', leftMissing: 2, rightMissing: 3 },
-            { left: 'FINAL', right: 'LOWLY', answer: 'ALLOW', leftMissing: 2, rightMissing: 3 },
-            { left: 'SWARM', right: 'ORDER', answer: 'ARMOR', leftMissing: 3, rightMissing: 2 },
-            { left: 'RANGE', right: 'RIGHT', answer: 'ANGER', leftMissing: 4, rightMissing: 1 },
-            { left: 'MARCH', right: 'ARMOR', answer: 'CHARM', leftMissing: 2, rightMissing: 3 },
-        ];
-
-       async function loadDictionary() {
+        async function loadGameData() {
+            // Load dictionary
             try {
-                // Try to load from GitHub - update this URL to match your repository
-                // Example: https://raw.githubusercontent.com/yourusername/yourrepo/main/dict.txt
-                const response = await fetch('dict.txt');
-                if (response.ok) {
-                    const text = await response.text();
+                const dictResponse = await fetch('dict.txt');
+                if (dictResponse.ok) {
+                    const text = await dictResponse.text();
                     DICTIONARY = text.trim().split('\n').map(word => word.trim().toUpperCase());
                     console.log('Dictionary loaded successfully with', DICTIONARY.length, 'words');
                 } else {
@@ -625,10 +606,51 @@
                 console.log('Dictionary file not found - accepting all 5-letter words');
                 DICTIONARY = null;
             }
+
+            // Load puzzles
+            try {
+                const puzzleResponse = await fetch('puzzles.js');
+                if (puzzleResponse.ok) {
+                    const puzzleText = await puzzleResponse.text();
+                    // Execute the puzzle file to get ORBIT_PUZZLES
+                    const scriptElement = document.createElement('script');
+                    scriptElement.textContent = puzzleText;
+                    document.head.appendChild(scriptElement);
+                    
+                    // ORBIT_PUZZLES should now be available globally
+                    if (typeof ORBIT_PUZZLES !== 'undefined') {
+                        PUZZLES = ORBIT_PUZZLES;
+                        console.log('Puzzles loaded successfully:', PUZZLES.length, 'puzzles');
+                    } else {
+                        throw new Error('ORBIT_PUZZLES not found in puzzle file');
+                    }
+                    
+                    // Clean up script element
+                    document.head.removeChild(scriptElement);
+                } else {
+                    throw new Error('Failed to fetch puzzles');
+                }
+            } catch (error) {
+                console.log('Puzzle file not found - using fallback puzzles');
+                // Fallback puzzles if file can't be loaded
+                PUZZLES = [
+                    { left: 'GHOST', right: 'ARTSY', answer: 'START', leftMissing: 2, rightMissing: 3 },
+                    { left: 'GREAT', right: 'ENDED', answer: 'EATEN', leftMissing: 3, rightMissing: 2 },
+                    { left: 'NACHO', right: 'SERVE', answer: 'CHOSE', leftMissing: 3, rightMissing: 2 },
+                    { left: 'GOLEM', right: 'URGED', answer: 'LEMUR', leftMissing: 3, rightMissing: 2 },
+                    { left: 'STARE', right: 'ACHED', answer: 'REACH', leftMissing: 2, rightMissing: 3 }
+                ];
+            }
+
             initGame();
         }
 
         function initGame() {
+            if (!PUZZLES || PUZZLES.length === 0) {
+                console.error('No puzzles available');
+                return;
+            }
+
             const puzzleIndex = Math.floor(Math.random() * PUZZLES.length);
             currentPuzzle = PUZZLES[puzzleIndex];
             currentPuzzleNumber = 1001 + puzzleIndex; // Assign puzzle number based on index
@@ -1083,7 +1105,7 @@
         }
 
         // Initialize game on load
-        loadDictionary();
+        loadGameData();
     </script>
 </body>
 </html>
