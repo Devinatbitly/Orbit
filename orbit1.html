@@ -567,10 +567,16 @@
 
         async function loadDictionary() {
             try {
-                // Load dictionary from your file
-                const response = await window.fs.readFile('dict.txt', { encoding: 'utf8' });
-                DICTIONARY = response.trim().split('\n').map(word => word.trim().toUpperCase());
-                console.log('Dictionary loaded successfully with', DICTIONARY.length, 'words');
+                // Try to load from GitHub - update this URL to match your repository
+                // Example: https://raw.githubusercontent.com/yourusername/yourrepo/main/dict.txt
+                const response = await fetch('dict.txt');
+                if (response.ok) {
+                    const text = await response.text();
+                    DICTIONARY = text.trim().split('\n').map(word => word.trim().toUpperCase());
+                    console.log('Dictionary loaded successfully with', DICTIONARY.length, 'words');
+                } else {
+                    throw new Error('Failed to fetch dictionary');
+                }
             } catch (error) {
                 console.log('Dictionary file not found - accepting all 5-letter words');
                 DICTIONARY = null;
