@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orbit - Find the Missing Link</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Bitly Brand Colors */
@@ -33,7 +36,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--base-01);
             color: var(--navy);
             min-height: 100vh;
@@ -55,6 +58,21 @@
             margin-bottom: 5px;
             font-weight: 700;
             letter-spacing: -0.5px;
+        }
+
+        .bitly-credit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            color: var(--base-07);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .bitly-logo {
+            width: 16px;
+            height: 16px;
         }
 
         .subtitle {
@@ -336,6 +354,40 @@
             color: white;
         }
 
+        .results-button {
+            background: var(--blue-dark);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 10px;
+            margin-top: 10px;
+            min-width: 40px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-button:hover {
+            background: var(--blue-light);
+        }
+
+        .results-button:disabled {
+            background: var(--base-05);
+            cursor: not-allowed;
+        }
+
+        .chart-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -492,9 +544,21 @@
 <body>
     <header>
         <h1>ORBIT</h1>
-        <p class="subtitle">Find the Missing Link between two words!</p>
+        <div class="bitly-credit">
+            <span>a</span>
+            <img class="bitly-logo" src="bitly.svg" alt="bitly" onerror="this.src='bitly.png'">
+            <span>game</span>
+        </div>
+        <p class="subtitle">Find the missing link between two words!</p>
         <div class="puzzle-number" id="puzzleNumber">Puzzle #1001</div>
-        <button class="help-button" onclick="showHowToPlay()">How to Play</button>
+        <div>
+            <button class="help-button" onclick="showHowToPlay()">How to Play</button>
+            <button class="results-button" id="viewResultsButton" onclick="showResults()" disabled title="View Results">
+                <svg class="chart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/>
+                </svg>
+            </button>
+        </div>
     </header>
     
     <div class="game-container">
@@ -548,11 +612,13 @@
 
     <div id="gameOverModal" class="modal">
         <div class="modal-content">
+            <button class="close-button" onclick="closeResults()">×</button>
             <h2 id="modalTitle">Game Over!</h2>
             <p id="modalMessage"></p>
             <div class="share-result" id="shareResult" style="display: none;"></div>
             <button onclick="shareResult()" id="shareButton" style="display: none;">Share Result</button>
             <button onclick="newGame()">New Game</button>
+            <button class="secondary" onclick="closeResults()">Close</button>
         </div>
     </div>
 
@@ -590,6 +656,11 @@
         let gameState = 'playing';
         let keyboardState = {};
         let gameResults = []; // Store results for sharing
+        let gameComplete = false; // Track if game has been completed
+
+        // Add debounce tracking for keyboard events
+        let lastKeyTime = 0;
+        let lastKey = '';
 
         async function loadGameData() {
             // Load dictionary
@@ -659,6 +730,7 @@
             gameState = 'playing';
             keyboardState = {};
             gameResults = [];
+            gameComplete = false;
             
             // Reset keyboard colors
             document.querySelectorAll('.key').forEach(key => {
@@ -667,6 +739,10 @@
             
             // Update puzzle number display
             document.getElementById('puzzleNumber').textContent = `Puzzle #${currentPuzzleNumber}`;
+            
+            // Disable view results button for new game
+            const viewResultsButton = document.getElementById('viewResultsButton');
+            viewResultsButton.disabled = true;
             
             displayPuzzle();
             createBoard();
@@ -779,10 +855,6 @@
                 board.appendChild(rowContainer);
             }
         }
-
-        // Add debounce tracking for keyboard events
-        let lastKeyTime = 0;
-        let lastKey = '';
 
         function setupKeyboard() {
             // On-screen keyboard
@@ -1050,6 +1122,10 @@
             const message = document.getElementById('modalMessage');
             const shareResult = document.getElementById('shareResult');
             const shareButton = document.getElementById('shareButton');
+            const viewResultsButton = document.getElementById('viewResultsButton');
+            
+            gameComplete = true;
+            viewResultsButton.disabled = false; // Enable the view results button
             
             if (won) {
                 title.textContent = 'Congratulations!';
@@ -1075,21 +1151,60 @@
                 navigator.share({
                     title: 'Orbit Puzzle',
                     text: shareText
-                });
-            } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(shareText).then(() => {
-                    showMessage('Results copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.log('Share failed:', err);
+                    // Fallback to copy
+                    copyResult();
                 });
             } else {
-                // Fallback: select the text
-                const shareResult = document.getElementById('shareResult');
-                const range = document.createRange();
-                range.selectNodeContents(shareResult);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
+                // Fallback to copy
+                copyResult();
+            }
+        }
+
+        function copyResult() {
+            const shareText = generateShareText();
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showMessage('Results copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.log('Copy failed:', err);
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+        }
+
+        function fallbackCopy() {
+            // Fallback: select the text
+            const shareResult = document.getElementById('shareResult');
+            const range = document.createRange();
+            range.selectNodeContents(shareResult);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                showMessage('Results copied to clipboard!', 'success');
+            } catch (err) {
                 showMessage('Results selected - copy with Ctrl+C', 'info');
             }
+        }
+
+        function showResults() {
+            if (!gameComplete) return;
+            
+            // Show the existing game over modal with results
+            const modal = document.getElementById('gameOverModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeResults() {
+            const modal = document.getElementById('gameOverModal');
+            modal.style.display = 'none';
         }
 
         function newGame() {
