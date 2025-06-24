@@ -1153,10 +1153,10 @@
             viewResultsButton.disabled = false; // Enable the view results button
             
             if (won) {
-                title.textContent = 'Congratulations!';
-                message.textContent = `You found the missing link in ${currentRow + 1} ${currentRow === 0 ? 'guess' : 'guesses'}!`;
+                title.textContent = 'Way to go!';
+                message.textContent = `You found the Missing Link in ${currentRow + 1} ${currentRow === 0 ? 'guess' : 'guesses'}!`;
             } else {
-                title.textContent = 'Game Over';
+                title.textContent = 'Better luck next time!';
                 message.textContent = `The answer was: ${currentPuzzle.answer}`;
             }
             
