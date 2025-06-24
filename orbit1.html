@@ -63,6 +63,13 @@
             margin-bottom: 15px;
         }
 
+        .puzzle-number {
+            color: var(--navy);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
         .game-container {
             width: 100%;
             max-width: 500px;
@@ -365,11 +372,20 @@
             font-weight: 600;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 10px 5px;
         }
 
         .modal button:hover {
             background: var(--orange-dark);
+        }
+
+        .modal button.secondary {
+            background: var(--base-04);
+            color: var(--navy);
+        }
+
+        .modal button.secondary:hover {
+            background: var(--base-05);
         }
 
         .close-button {
@@ -429,6 +445,19 @@
             background: var(--base-05);
         }
 
+        .share-result {
+            background: white;
+            border: 1px solid var(--base-04);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre;
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
         @media (max-width: 480px) {
             .tile {
                 width: 35px;
@@ -464,6 +493,7 @@
     <header>
         <h1>ORBIT</h1>
         <p class="subtitle">Find the missing link between two words!</p>
+        <div class="puzzle-number" id="puzzleNumber">Puzzle #1001</div>
         <button class="help-button" onclick="showHowToPlay()">How to Play</button>
     </header>
     
@@ -520,6 +550,8 @@
         <div class="modal-content">
             <h2 id="modalTitle">Game Over!</h2>
             <p id="modalMessage"></p>
+            <div class="share-result" id="shareResult" style="display: none;"></div>
+            <button onclick="shareResult()" id="shareButton" style="display: none;">Share Result</button>
             <button onclick="newGame()">New Game</button>
         </div>
     </div>
@@ -551,10 +583,12 @@
         // Game state
         let DICTIONARY = null;
         let currentPuzzle;
+        let currentPuzzleNumber;
         let currentRow = 0;
         let currentGuess = [];
         let gameState = 'playing';
         let keyboardState = {};
+        let gameResults = []; // Store results for sharing
 
         // Game puzzles - verified puzzle set
         const PUZZLES = [
@@ -564,11 +598,15 @@
             { left: 'GOLEM', right: 'URGED', answer: 'LEMUR', leftMissing: 3, rightMissing: 2 },
             { left: 'DEALT', right: 'ERASE', answer: 'ALTER', leftMissing: 3, rightMissing: 2 },
             { left: 'STARE', right: 'ACHED', answer: 'REACH', leftMissing: 2, rightMissing: 3 },
+            { left: 'COMET', right: 'HINGE', answer: 'THING', leftMissing: 1, rightMissing: 4 },
             { left: 'AHEAD', right: 'OPTED', answer: 'ADOPT', leftMissing: 2, rightMissing: 3 },
             { left: 'KNEAD', right: 'ULTRA', answer: 'ADULT', leftMissing: 2, rightMissing: 3 },
             { left: 'DECAF', right: 'TERSE', answer: 'AFTER', leftMissing: 2, rightMissing: 3 },
             { left: 'EQUAL', right: 'BUMPY', answer: 'ALBUM', leftMissing: 2, rightMissing: 3 },
             { left: 'FINAL', right: 'LOWLY', answer: 'ALLOW', leftMissing: 2, rightMissing: 3 },
+            { left: 'SWARM', right: 'ORDER', answer: 'ARMOR', leftMissing: 3, rightMissing: 2 },
+            { left: 'RANGE', right: 'RIGHT', answer: 'ANGER', leftMissing: 4, rightMissing: 1 },
+            { left: 'MARCH', right: 'ARMOR', answer: 'CHARM', leftMissing: 2, rightMissing: 3 },
         ];
 
         async function loadDictionary() {
@@ -591,16 +629,22 @@
         }
 
         function initGame() {
-            currentPuzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+            const puzzleIndex = Math.floor(Math.random() * PUZZLES.length);
+            currentPuzzle = PUZZLES[puzzleIndex];
+            currentPuzzleNumber = 1001 + puzzleIndex; // Assign puzzle number based on index
             currentRow = 0;
             currentGuess = [];
             gameState = 'playing';
             keyboardState = {};
+            gameResults = [];
             
             // Reset keyboard colors
             document.querySelectorAll('.key').forEach(key => {
                 key.classList.remove('correct', 'present', 'absent');
             });
+            
+            // Update puzzle number display
+            document.getElementById('puzzleNumber').textContent = `Puzzle #${currentPuzzleNumber}`;
             
             displayPuzzle();
             createBoard();
@@ -720,9 +764,13 @@
                 button.addEventListener('click', () => handleKey(button.dataset.key));
             });
             
-            // Physical keyboard
+            // Physical keyboard - prevent event bubbling
             document.addEventListener('keydown', (e) => {
                 if (gameState !== 'playing') return;
+                
+                // Prevent default behavior and stop propagation to avoid duplication
+                e.preventDefault();
+                e.stopPropagation();
                 
                 if (e.key === 'Enter') {
                     handleKey('Enter');
@@ -802,7 +850,8 @@
             }
             
             // Evaluate guess
-            evaluateGuess();
+            const evaluation = evaluateGuess();
+            gameResults.push(evaluation);
             
             // Check win/loss after animation completes
             setTimeout(() => {
@@ -877,6 +926,8 @@
                     }
                 }, i * 200); // Changed to 200ms (doubled from original 100ms)
             });
+
+            return evaluation;
         }
 
         function shakeRow() {
@@ -903,10 +954,54 @@
             }, 2000);
         }
 
+        function generateShareText() {
+            const resultLine = gameState === 'won' 
+                ? `Orbit ${currentPuzzleNumber} ${currentRow + 1}/6`
+                : `Orbit ${currentPuzzleNumber} X/6`;
+            
+            let shareText = resultLine + '\n\n';
+            
+            // Convert results to emoji grid
+            gameResults.forEach(evaluation => {
+                let line = '';
+                
+                // Add squares for left word portion
+                for (let i = 0; i < currentPuzzle.leftMissing; i++) {
+                    if (evaluation[i] === 'correct') {
+                        line += '🟩';
+                    } else if (evaluation[i] === 'present') {
+                        line += '🟨';
+                    } else {
+                        line += '⬜';
+                    }
+                }
+                
+                // Add bullet separator
+                line += '•';
+                
+                // Add squares for right word portion
+                for (let i = currentPuzzle.leftMissing; i < currentPuzzle.answer.length; i++) {
+                    if (evaluation[i] === 'correct') {
+                        line += '🟩';
+                    } else if (evaluation[i] === 'present') {
+                        line += '🟨';
+                    } else {
+                        line += '⬜';
+                    }
+                }
+                
+                shareText += line + '\n';
+            });
+            
+            return shareText.trim();
+        }
+
         function showGameOver(won) {
             const modal = document.getElementById('gameOverModal');
             const title = document.getElementById('modalTitle');
             const message = document.getElementById('modalMessage');
+            const shareResult = document.getElementById('shareResult');
+            const shareButton = document.getElementById('shareButton');
             
             if (won) {
                 title.textContent = 'Congratulations!';
@@ -916,7 +1011,37 @@
                 message.textContent = `The answer was: ${currentPuzzle.answer}`;
             }
             
+            // Generate and show share result
+            const shareText = generateShareText();
+            shareResult.textContent = shareText;
+            shareResult.style.display = 'block';
+            shareButton.style.display = 'inline-block';
+            
             modal.style.display = 'flex';
+        }
+
+        function shareResult() {
+            const shareText = generateShareText();
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Orbit Puzzle',
+                    text: shareText
+                });
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText).then(() => {
+                    showMessage('Results copied to clipboard!', 'success');
+                });
+            } else {
+                // Fallback: select the text
+                const shareResult = document.getElementById('shareResult');
+                const range = document.createRange();
+                range.selectNodeContents(shareResult);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                showMessage('Results selected - copy with Ctrl+C', 'info');
+            }
         }
 
         function newGame() {
