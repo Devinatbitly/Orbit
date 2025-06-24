@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orbit - Find the Missing Link</title>
+    <title>Orbit - a word game by Bitly</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -47,9 +47,31 @@
         }
 
         header {
-            text-align: center;
-            margin-bottom: 20px;
             width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .title-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .button-section {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding-top: 8px;
+            padding-right: 8px;
         }
 
         h1 {
@@ -63,17 +85,20 @@
         .bitly-credit {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 5px;
             color: var(--base-07);
             font-size: 0.8rem;
-            margin-bottom:20px;
-            margin-top:-8px;
+            margin-top: -8px;
         }
 
         .bitly-logo {
             width: 36px;
             margin-bottom: -5px;
+        }
+
+        .header-center {
+            text-align: center;
+            width: 100%;
         }
 
         .subtitle {
@@ -347,7 +372,6 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 10px;
         }
 
         .help-button:hover {
@@ -365,14 +389,11 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-left: 10px;
-            margin-top: 10px;
             min-width: 40px;
             height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            vertical-align: bottom;
         }
 
         .results-button:hover {
@@ -513,6 +534,20 @@
         }
 
         @media (max-width: 480px) {
+            .header-top {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .title-section {
+                align-items: center;
+            }
+
+            .button-section {
+                justify-content: center;
+            }
+
             .tile {
                 width: 35px;
                 height: 35px;
@@ -545,21 +580,27 @@
 </head>
 <body>
     <header>
-        <h1>ORBIT</h1>
-        <div class="bitly-credit">
-            <span>a</span>
-            <img class="bitly-logo" src="bitly.svg" alt="bitly" onerror="this.src='bitly.png'">
-            <span>game</span>
+        <div class="header-top">
+            <div class="title-section">
+                <h1>ORBIT</h1>
+                <div class="bitly-credit">
+                    <span>a</span>
+                    <img class="bitly-logo" src="bitly.svg" alt="bitly" onerror="this.src='bitly.png'">
+                    <span>game</span>
+                </div>
+            </div>
+            <div class="button-section">
+                <button class="help-button" onclick="showHowToPlay()">How to Play</button>
+                <button class="results-button" id="viewResultsButton" onclick="showResults()" disabled title="View Results">
+                    <svg class="chart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                        <path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <p class="subtitle">Find the missing link between two words!</p>
-        <div class="puzzle-number" id="puzzleNumber">Puzzle #1001</div>
-        <div>
-            <button class="help-button" onclick="showHowToPlay()">How to Play</button>
-            <button class="results-button" id="viewResultsButton" onclick="showResults()" disabled title="View Results">
-                <svg class="chart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                    <path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/>
-                </svg>
-            </button>
+        <div class="header-center">
+            <p class="subtitle">Can you find the Missing Link between these two words?</p>
+            <div class="puzzle-number" id="puzzleNumber">Puzzle #1001</div>
         </div>
     </header>
     
