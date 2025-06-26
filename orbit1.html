@@ -543,92 +543,105 @@
             }
 
             header {
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
 
             h1 {
-                font-size: 2.8rem;
+                font-size: 3rem;
             }
 
             .bitly-credit {
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
 
             .subtitle {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
 
             .puzzle-number {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+
+            .header-center {
+                padding-top: 5px;
             }
 
             .game-container {
-                gap: 15px;
+                gap: 8px;
                 flex: 1;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
-                max-height: calc(100vh - 120px);
+                height: calc(100vh - 140px);
+                overflow: hidden;
+            }
+
+            .puzzle-display {
+                padding: 12px;
+                margin-bottom: 5px;
             }
 
             .board-container {
-                margin-bottom: 10px;
+                margin-bottom: 5px;
+                flex: 0 0 auto;
             }
 
             .guess-row-container {
-                gap: 5px;
-                margin-bottom: 3px;
+                gap: 4px;
+                margin-bottom: 2px;
             }
 
             .orbit-letters {
-                gap: 2px;
+                gap: 1px;
             }
 
             .tile {
-                width: 38px;
-                height: 38px;
-                font-size: 1.1rem;
-            }
-            
-            .orbit-letter {
-                width: 22px;
-                height: 22px;
-                font-size: 0.85rem;
-            }
-            
-            .key {
-                min-width: 28px;
-                height: 48px;
-                font-size: 1rem;
-            }
-
-            .key.wide {
-                font-size: 0.85rem;
-            }
-            
-            .word-pair {
-                gap: 12px;
+                width: 40px;
+                height: 40px;
                 font-size: 1.3rem;
             }
             
-            .letter-box {
-                width: 28px;
-                height: 28px;
+            .orbit-letter {
+                width: 20px;
+                height: 20px;
+                font-size: 0.8rem;
+            }
+            
+            .key {
+                min-width: 30px;
+                height: 50px;
+                font-size: 1.1rem;
+            }
+
+            .key.wide {
                 font-size: 0.9rem;
+                max-width: 70px;
+            }
+            
+            .word-pair {
+                gap: 15px;
+                font-size: 1.4rem;
+            }
+            
+            .letter-box {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
             }
 
             .help-button {
                 font-size: 1rem;
-                padding: 10px 18px;
+                padding: 10px 16px;
             }
 
             .keyboard {
-                margin-top: 0;
+                margin-top: auto;
                 flex-shrink: 0;
+                gap: 6px;
             }
 
-            .puzzle-display {
-                padding: 18px;
+            .keyboard-row {
+                gap: 4px;
             }
         }
     </style>
