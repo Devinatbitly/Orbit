@@ -17,8 +17,23 @@ const ORBIT_PUZZLES = [
             { left: 'SWARM', right: 'ORDER', answer: 'ARMOR', leftMissing: 3, rightMissing: 2 },
             { left: 'RANGE', right: 'RIGHT', answer: 'ANGER', leftMissing: 4, rightMissing: 1 },
             { left: 'MARCH', right: 'ARMOR', answer: 'CHARM', leftMissing: 2, rightMissing: 3 },
+            { left: 'METAL', right: 'ONSET', answer: 'TALON', leftMissing: 3, rightMissing: 2 },
+            { left: 'AGAIN', right: 'TROOP', answer: 'INTRO', leftMissing: 2, rightMissing: 3 },
+            { left: 'SINCH', right: 'ORDER', answer: 'CHORD', leftMissing: 2, rightMissing: 3 },
+            { left: 'TEACH', right: 'ESSAY', answer: 'CHESS', leftMissing: 2, rightMissing: 3 },
+            { left: 'BEGAN', right: 'GLEAM', answer: 'ANGLE', leftMissing: 2, rightMissing: 3 },
+            { left: 'CAUSE', right: 'VENUE', answer: 'SEVEN', leftMissing: 2, rightMissing: 3 },
+            { left: 'HENNA', right: 'STYLE', answer: 'NASTY', leftMissing: 2, rightMissing: 3 },
             { left: 'BLEND', right: 'INGOT', answer: 'DINGO', leftMissing: 1, rightMissing: 4 },
-            { left: 'METAL', right: 'ONSET', answer: 'TALON', leftMissing: 3, rightMissing: 2 }
+            { left: 'CHINA', right: 'VALID', answer: 'NAVAL', leftMissing: 2, rightMissing: 3 },
+            { left: 'CLEAR', right: 'GUESS', answer: 'ARGUE', leftMissing: 2, rightMissing: 3 },
+            { left: 'CLOTH', right: 'ANKLE', answer: 'THANK', leftMissing: 2, rightMissing: 3 },
+            { left: 'COAST', right: 'OUTER', answer: 'STOUT', leftMissing: 2, rightMissing: 3 },
+            { left: 'BEAST', right: 'RAPID', answer: 'STRAP', leftMissing: 2, rightMissing: 3 },
+            { left: 'BLAST', right: 'UNTIL', answer: 'STUNT', leftMissing: 2, rightMissing: 3 },
+            { left: 'CREST', right: 'AGENT', answer: 'STAGE', leftMissing: 2, rightMissing: 3 },
+            { left: 'BENCH', right: 'AMPLE', answer: 'CHAMP', leftMissing: 2, rightMissing: 3 },
+
 
 ];
 
