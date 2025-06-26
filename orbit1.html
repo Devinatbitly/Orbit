@@ -137,7 +137,7 @@
             justify-content: center;
             align-items: center;
             gap: 15px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
         }
 
@@ -147,8 +147,8 @@
         }
 
         .letter-box {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border: 2px solid var(--base-04);
             display: flex;
             align-items: center;
@@ -156,7 +156,7 @@
             font-weight: 700;
             text-transform: uppercase;
             background: white;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
         }
 
         .letter-box.filled {
@@ -171,9 +171,9 @@
         }
 
         .connector {
-            color: var(--base-05);
-            font-size: 0.8rem;
-            font-weight: 400;
+            color: var(--navy);
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .board-container {
@@ -208,10 +208,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             text-transform: uppercase;
-            color: var(--base-07);
+            color: var(--navy);
         }
 
         .tile {
@@ -624,9 +624,9 @@
             }
             
             .letter-box {
-                width: 30px;
-                height: 30px;
-                font-size: 1rem;
+                width: 35px;
+                height: 35px;
+                font-size: 1.2rem;
             }
 
             .help-button {
@@ -676,7 +676,7 @@
         <div class="puzzle-display">
             <div class="word-pair">
                 <div class="word" id="leftWord"></div>
-                <span class="connector">and</span>
+                <span class="connector">+</span>
                 <div class="word" id="rightWord"></div>
             </div>
         </div>
@@ -962,7 +962,7 @@
                 separator.className = 'orbit-letter';
                 separator.style.width = '15px';
                 separator.style.paddingTop = '10px';
-                separator.innerHTML = '&bull;';
+                separator.innerHTML = '+';
                 row.appendChild(separator);
                 
                 // Add tiles for right word portion
@@ -1230,8 +1230,8 @@
                     }
                 }
                 
-                // Add bullet separator
-                line += '•';
+                // Add plus separator
+                line += '+';
                 
                 // Add squares for right word portion
                 for (let i = currentPuzzle.leftMissing; i < currentPuzzle.answer.length; i++) {
