@@ -17,6 +17,9 @@ const ORBIT_PUZZLES = [
             { left: 'SWARM', right: 'ORDER', answer: 'ARMOR', leftMissing: 3, rightMissing: 2 },
             { left: 'RANGE', right: 'RIGHT', answer: 'ANGER', leftMissing: 4, rightMissing: 1 },
             { left: 'MARCH', right: 'ARMOR', answer: 'CHARM', leftMissing: 2, rightMissing: 3 },
+            { left: 'BLEND', right: 'INGOT', answer: 'DINGO', leftMissing: 1, rightMissing: 4 },
+            { left: 'METAL', right: 'ONSET', answer: 'TALON', leftMissing: 3, rightMissing: 2 }
+
 ];
 
 // Export for use in other files
